@@ -1,0 +1,82 @@
+# Docker Compose to Kubernetes Translation
+# Original docker-compose.yml has 2 services: listener and speaker
+
+---
+# Deployment for listener service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: listener
+  labels:
+    app: listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: listener
+  template:
+    metadata:
+      labels:
+        app: listener
+    spec:
+      containers:
+      - name: listener
+        image: shekeriev/k8s-listener
+        imagePullPolicy: Always
+
+---
+# Service for listener (ClusterIP - internal access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: listener
+spec:
+  selector:
+    app: listener
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Deployment for speaker service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speaker
+  labels:
+    app: speaker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speaker
+  template:
+    metadata:
+      labels:
+        app: speaker
+    spec:
+      containers:
+      - name: speaker
+        image: shekeriev/k8s-speaker
+        imagePullPolicy: Always
+        env:
+        - name: LISTENER_SERVICE
+          value: "listener:5000"
+
+---
+# Service for speaker (NodePort - external access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: speaker
+spec:
+  selector:
+    app: speaker
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 30080
+  type: NodePort
