@@ -1,0 +1,280 @@
+# Kubernetes Homework Tasks - Complete Guide
+
+## Prerequisites
+- Minikube installed and running
+- kubectl installed and configured
+- Windows 11 Pro machine
+
+## Start Minikube (if not already running)
+```bash
+minikube start
+```
+
+---
+
+## Task 1: Execute Commands
+
+### a. Create namespace named homework
+```bash
+kubectl create namespace homework
+```
+
+### b. Create homework-1 pod with labels
+```bash
+kubectl run homework-1 --image=shekeriev/k8s-oracle --labels="app=hw,tier=gold" -n homework
+```
+
+### c. Remove the tier=gold label
+```bash
+kubectl label pod homework-1 tier- -n homework
+```
+
+### d. Create homework-2 pod
+```bash
+kubectl run homework-2 --image=shekeriev/k8s-oracle -n homework
+```
+
+### e. Add label to homework-2 pod
+```bash
+kubectl label pod homework-2 app=hw -n homework
+```
+
+### f. Set annotation on both pods
+```bash
+kubectl annotate pod homework-1 purpose=homework -n homework
+kubectl annotate pod homework-2 purpose=homework -n homework
+```
+
+### g. Create service to expose both pods
+```bash
+kubectl expose pod homework-1 --name=homework-svc --type=NodePort --port=80 --target-port=80 -n homework
+kubectl patch service homework-svc -n homework --type='json' -p='[{"op":"replace","path":"/spec/ports/0/nodePort","value":32000}]'
+kubectl patch service homework-svc -n homework --type='json' -p='[{"op":"replace","path":"/spec/selector","value":{"app":"hw"}}]'
+```
+
+**Note:** The service needs to use a selector that matches both pods (app=hw).
+
+### Verify your work
+```bash
+# Check namespace
+kubectl get namespace homework
+
+# Check pods with labels
+kubectl get pods -n homework --show-labels
+
+# Check annotations
+kubectl describe pod homework-1 -n homework | findstr Annotations
+kubectl describe pod homework-2 -n homework | findstr Annotations
+
+# Check service
+kubectl get svc homework-svc -n homework
+kubectl describe svc homework-svc -n homework
+
+# Get the Minikube IP and test
+minikube ip
+# Access: http://<minikube-ip>:32000
+```
+
+---
+
+## Task 2: Create Manifests and Apply One by One
+
+### 1. Create `namespace.yaml`
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homework
+```
+
+Apply it:
+```bash
+kubectl apply -f namespace.yaml
+```
+
+### 2. Create `homework-1-pod.yaml`
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-1
+  namespace: homework
+  labels:
+    app: hw
+  annotations:
+    purpose: homework
+spec:
+  containers:
+  - name: oracle
+    image: shekeriev/k8s-oracle
+```
+
+Apply it:
+```bash
+kubectl apply -f homework-1-pod.yaml
+```
+
+### 3. Create `homework-2-pod.yaml`
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-2
+  namespace: homework
+  labels:
+    app: hw
+  annotations:
+    purpose: homework
+spec:
+  containers:
+  - name: oracle
+    image: shekeriev/k8s-oracle
+```
+
+Apply it:
+```bash
+kubectl apply -f homework-2-pod.yaml
+```
+
+### 4. Create `homework-svc.yaml`
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: homework-svc
+  namespace: homework
+spec:
+  type: NodePort
+  selector:
+    app: hw
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 32000
+```
+
+Apply it:
+```bash
+kubectl apply -f homework-svc.yaml
+```
+
+---
+
+## Task 3: Two Ways to Submit All Manifests at Once
+
+### Method 1: Apply Multiple Files in One Command
+```bash
+kubectl apply -f namespace.yaml -f homework-1-pod.yaml -f homework-2-pod.yaml -f homework-svc.yaml
+```
+
+### Method 2: Apply All Files in a Directory
+First, organize all YAML files in a directory (e.g., `homework-manifests`), then:
+
+```bash
+kubectl apply -f homework-manifests/
+```
+
+This will apply all YAML files in the directory.
+
+### Alternative Method 3: Multi-Document YAML File
+Create a single file `all-resources.yaml` with all resources separated by `---`:
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homework
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-1
+  namespace: homework
+  labels:
+    app: hw
+  annotations:
+    purpose: homework
+spec:
+  containers:
+  - name: oracle
+    image: shekeriev/k8s-oracle
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-2
+  namespace: homework
+  labels:
+    app: hw
+  annotations:
+    purpose: homework
+spec:
+  containers:
+  - name: oracle
+    image: shekeriev/k8s-oracle
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homework-svc
+  namespace: homework
+spec:
+  type: NodePort
+  selector:
+    app: hw
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 32000
+```
+
+Apply it:
+```bash
+kubectl apply -f all-resources.yaml
+```
+
+---
+
+## Cleanup (Optional)
+
+To remove everything:
+```bash
+kubectl delete namespace homework
+```
+
+---
+
+## Verification Commands Summary
+
+```bash
+# List all resources in namespace
+kubectl get all -n homework
+
+# Check pods with labels and annotations
+kubectl get pods -n homework --show-labels
+kubectl describe pods -n homework
+
+# Check service endpoints
+kubectl get endpoints homework-svc -n homework
+
+# Access the service
+minikube service homework-svc -n homework --url
+```
+
+---
+
+## Important Notes
+
+1. **NodePort Range**: Kubernetes NodePort services use ports in the range 30000-32767 by default, so 32000 is valid.
+
+2. **Service Selector**: The service uses `app: hw` as the selector, which matches both pods.
+
+3. **Windows Commands**: On Windows, use `findstr` instead of `grep` for filtering output.
+
+4. **Minikube Access**: To access the service, you can use:
+   ```bash
+   minikube service homework-svc -n homework
+   ```
+   This will open the service in your default browser.
+
+5. **Order Matters**: When applying manifests, the namespace should be created first, followed by pods and services.
