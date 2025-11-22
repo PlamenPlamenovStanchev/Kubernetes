@@ -1,14 +1,14 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consumer-deploy
+  name: producer-deploy
   namespace: projectx
 spec:
   replicas: 3
   selector:
     matchLabels: 
       app: fun-facts
-      role: consumer
+      role: producer
   minReadySeconds: 15
   strategy:
     type: RollingUpdate
@@ -19,11 +19,11 @@ spec:
     metadata:
       labels:
         app: fun-facts
-        role: consumer
+        role: producer
     spec:
       containers:
-      - name: cons-container
-        image: shekeriev/k8s-consumer:latest
+      - name: prod-container
+        image: shekeriev/k8s-producer:latest
         ports:
         - containerPort: 5000
         resources:
