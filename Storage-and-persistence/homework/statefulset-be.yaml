@@ -1,0 +1,32 @@
+﻿apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: facts-be
+spec:
+  serviceName: service-be
+  replicas: 3
+  selector:
+    matchLabels:
+      app: facts-be
+  template:
+    metadata:
+      labels:
+        app: facts-be
+    spec:
+      containers:
+      - name: facts-backend
+        image: shekeriev/k8s-facts
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
