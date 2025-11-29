@@ -1,0 +1,12 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: service-fe
+spec:
+  type: NodePort
+  selector:
+    app: facts-fe
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP

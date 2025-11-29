@@ -1,0 +1,41 @@
+﻿apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-0
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: <MINIKUBE_IP>
+    path: /srv/nfs/pv0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-1
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: <MINIKUBE_IP>
+    path: /srv/nfs/pv1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-2
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: <MINIKUBE_IP>
+    path: /srv/nfs/pv2
