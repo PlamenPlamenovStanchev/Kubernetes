@@ -1,0 +1,40 @@
+﻿apiVersion: v1
+kind: Pod
+metadata:
+  name: init-demo
+spec:
+  initContainers:
+  - name: init-first
+    image: busybox:1.35
+    command: ['sh', '-c']
+    args:
+      - |
+        echo "$(date '+%d-%m-%Y %H:%M:%S') => begin initialization ..." > /work-dir/index.html
+        sleep 10
+        echo "$(date '+%d-%m-%Y %H:%M:%S') => ... done" >> /work-dir/index.html
+    volumeMounts:
+    - name: workdir
+      mountPath: /work-dir
+  
+  - name: init-second
+    image: busybox:1.35
+    command: ['sh', '-c']
+    args:
+      - |
+        echo "$(date '+%d-%m-%Y %H:%M:%S') => launching the application ..." >> /work-dir/index.html
+    volumeMounts:
+    - name: workdir
+      mountPath: /work-dir
+  
+  containers:
+  - name: nginx
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: workdir
+      mountPath: /usr/share/nginx/html
+  
+  volumes:
+  - name: workdir
+    emptyDir: {}
