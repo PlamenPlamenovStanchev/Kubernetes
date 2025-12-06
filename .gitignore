@@ -1,0 +1,132 @@
+# ======================
+# Security: Certificates, Keys, Secrets, Passwords
+# ======================
+
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.p8
+*.ppk
+
+# Certificates
+*.crt
+*.cer
+*.der
+*.ca-bundle
+
+# SSH keys
+id_rsa
+id_rsa.*
+id_dsa
+id_dsa.*
+id_ecdsa
+id_ecdsa.*
+id_ed25519
+id_ed25519.*
+*.pub
+known_hosts
+
+# GPG keys
+*.gpg
+*.asc
+secring.*
+
+# Secrets and credentials files
+*.secret
+*.secrets
+*secret*
+*secrets*
+credentials
+credentials.*
+.credentials
+*.credential
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+
+# Password files
+*password*
+*passwd*
+*.htpasswd
+
+# API keys and tokens
+*apikey*
+*api_key*
+*token*
+*.token
+
+# Kubernetes secrets (plain YAML with sensitive data)
+*-secret.yaml
+*-secret.yml
+*-secrets.yaml
+*-secrets.yml
+secret.yaml
+secret.yml
+secrets.yaml
+secrets.yml
+
+# Kubeconfig files (may contain tokens/certs)
+kubeconfig
+kubeconfig.*
+.kube/
+*.kubeconfig
+
+# Helm secrets
+secrets.yaml
+secrets.yml
+**/charts/**/secrets.yaml
+**/charts/**/secrets.yml
+
+# Terraform state (may contain secrets)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Ansible vault files
+*.vault
+*vault*.yml
+*vault*.yaml
+
+# Docker config (may contain registry credentials)
+.docker/config.json
+docker-config.json
+
+# Cloud provider credentials
+.aws/
+.azure/
+.gcp/
+gcloud/
+service-account*.json
+*-service-account.json
+*serviceaccount*.json
+
+# IDE and editor secrets
+.idea/secrets/
+.vscode/*.secret
+
+# Backup files that may contain secrets
+*.bak
+*.backup
+*.old
+*.orig
+
+# Log files that may leak secrets
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Large binary files (like ISOs - avoid pushing by accident)
+*.iso
+*.img
+*.dmg
+*.vmdk
+*.ova
+*.box
