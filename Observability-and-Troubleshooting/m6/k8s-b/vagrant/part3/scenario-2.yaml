@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: readiness-http
+  name: readiness-http
+spec:
+  initContainers:
+  - name: init-data
+    image: alpine
+    command: ["/bin/sh", "-c"]
+    args:
+      - echo '(Almost) Always Ready to Serve ;) ' > /usr/share/nginx/html/index.html
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html
+
+  containers:
+  - name: readiness
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 3
+
+  volumes:
+  - name: html
+    emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: readiness-cmd
+  labels:
+    app: readiness-cmd
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    app: readiness-cmd
+
