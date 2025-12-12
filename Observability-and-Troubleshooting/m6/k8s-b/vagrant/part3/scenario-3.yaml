@@ -31,7 +31,7 @@ spec:
         command:
         - cat
         - /check/healthy.html
-      failureThreshold: 3
+      failureThreshold: 10
       periodSeconds: 5
   - name: cont-sidecar-postpone
     image: alpine
@@ -71,7 +71,8 @@ spec:
   type: NodePort
   ports:
   - port: 8080
+    targetPort: 80
     nodePort: 30001
     protocol: TCP
   selector:
-    app: startup-nixed
+    app: startup-mixed
