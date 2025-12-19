@@ -1,0 +1,23 @@
+﻿apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: homework
+
+bases:
+  - ../../base
+
+replicas:
+  - name: homework
+    count: 5
+
+patches:
+  - target:
+      kind: Service
+      name: homework-svc
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 5002
+      - op: replace
+        path: /spec/ports/0/targetPort
+        value: 5002

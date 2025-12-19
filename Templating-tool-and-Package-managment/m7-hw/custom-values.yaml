@@ -1,0 +1,8 @@
+﻿replicaCount: 5
+
+indexHtml:
+  text: "This is my CUSTOM text via Helm upgrade!"
+  imageUrl: "https://helm.sh/img/helm.svg"
+
+service:
+  nodePort: 31001
